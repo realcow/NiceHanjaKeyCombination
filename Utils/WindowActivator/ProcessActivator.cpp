@@ -13,18 +13,18 @@ namespace
 }
 
 /*
-    Âü°í¸µÅ©: Taking a Snapshot and Viewing Processes(http://msdn.microsoft.com/ko-kr/library/windows/desktop/ms686701(v=vs.85).aspx)
+    ì°¸ê³ ë§í¬: Taking a Snapshot and Viewing Processes(http://msdn.microsoft.com/ko-kr/library/windows/desktop/ms686701(v=vs.85).aspx)
 */
 bool ActivateProcess(const wstring& imageFilename)
 {
-    // Ã£´Â ÀÌ¹ÌÁö ÀÌ¸§À» °¡Áø ÇÁ·Î¼¼½º¸¦ °Ë»ö
+    // ì°¾ëŠ” ì´ë¯¸ì§€ ì´ë¦„ì„ ê°€ì§„ í”„ë¡œì„¸ìŠ¤ë¥¼ ê²€ìƒ‰
     DWORD pidToActivate = FindProcessByImageName(imageFilename);
     if (pidToActivate == (DWORD)-1)
     {
         return false;
     }
 
-    // ÇÁ·Î¼¼½º°¡ °¡Áø À©µµ¿ì Áß ActivateÇÒ À©µµ¿ì¸¦ Ã£À½.
+    // í”„ë¡œì„¸ìŠ¤ê°€ ê°€ì§„ ìœˆë„ìš° ì¤‘ Activateí•  ìœˆë„ìš°ë¥¼ ì°¾ìŒ.
     HWND hwndToActivate = FindWindowHandleFromPid(pidToActivate);
     if (!hwndToActivate)
     {
@@ -34,7 +34,7 @@ bool ActivateProcess(const wstring& imageFilename)
     // Activate
     SetForeground(hwndToActivate);
 
-    // Å¸°Ù À©µµ¿ì Å¸ÀÌÆ² Ãâ·Â; µğ¹ö±ë¿ë
+    // íƒ€ê²Ÿ ìœˆë„ìš° íƒ€ì´í‹€ ì¶œë ¥; ë””ë²„ê¹…ìš©
     if (0)
     {
         WCHAR buff[100];

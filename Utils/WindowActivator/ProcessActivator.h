@@ -2,5 +2,5 @@
 #include <Windows.h>
 #include <string>
 
-// ÆÄÀÏÀÌ¸§À¸·Î ÇÁ·Î¼¼½º¸¦ Ã£¾Æ ±× ÇÁ·Î¼¼½º°¡ °¡Áø À©µµ¿ì¸¦ ÇÁ·ÐÆ®·Î ³»¼¼¿î´Ù
+// íŒŒì¼ì´ë¦„ìœ¼ë¡œ í”„ë¡œì„¸ìŠ¤ë¥¼ ì°¾ì•„ ê·¸ í”„ë¡œì„¸ìŠ¤ê°€ ê°€ì§„ ìœˆë„ìš°ë¥¼ í”„ë¡ íŠ¸ë¡œ ë‚´ì„¸ìš´ë‹¤
 bool ActivateProcess(const std::wstring& imageFilename);
