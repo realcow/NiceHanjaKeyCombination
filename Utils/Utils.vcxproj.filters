@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ProcessActivator">
+      <UniqueIdentifier>{debd668b-d8d9-41f5-970d-86f5c09ab5da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PrecompiledHeader">
+      <UniqueIdentifier>{d7c5ac89-c0da-47e2-964f-26799f880f85}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="WindowActivator\ProcessActivator.h">
+      <Filter>ProcessActivator</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>PrecompiledHeader</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WindowActivator\ProcessActivator.cpp">
+      <Filter>ProcessActivator</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>PrecompiledHeader</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

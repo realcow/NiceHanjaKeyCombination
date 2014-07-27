@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KeyboardHookAgent", "Keyboa
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NiceHanjaKeyCombination", "NiceHanjaKeyCombination\NiceHanjaKeyCombination.vcxproj", "{58636993-36DA-428A-82B9-00F0F6C1D918}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utils", "Utils\Utils.vcxproj", "{68CE8598-CE86-4D05-A128-AA633CD0625B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,6 +23,10 @@ Global
 		{58636993-36DA-428A-82B9-00F0F6C1D918}.Debug|Win32.Build.0 = Debug|Win32
 		{58636993-36DA-428A-82B9-00F0F6C1D918}.Release|Win32.ActiveCfg = Release|Win32
 		{58636993-36DA-428A-82B9-00F0F6C1D918}.Release|Win32.Build.0 = Release|Win32
+		{68CE8598-CE86-4D05-A128-AA633CD0625B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{68CE8598-CE86-4D05-A128-AA633CD0625B}.Debug|Win32.Build.0 = Debug|Win32
+		{68CE8598-CE86-4D05-A128-AA633CD0625B}.Release|Win32.ActiveCfg = Release|Win32
+		{68CE8598-CE86-4D05-A128-AA633CD0625B}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

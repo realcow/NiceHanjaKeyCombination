@@ -4,7 +4,7 @@
 #include <functional>
 #include <vector>
 #include <algorithm>
-#include "DLLDefines.h"
+#include <Utils/WindowActivator/ProcessActivator.h>
 
 using namespace std;
 
@@ -55,6 +55,7 @@ struct KeyHandlerEntry
 };
 
 void OnArrowKey(WORD key);
+void OnHomeKey(WORD key);
 
 vector<KeyHandlerEntry> keyHandlers = 
     {
@@ -62,6 +63,8 @@ vector<KeyHandlerEntry> keyHandlers =
         { VK_UP, OnArrowKey },
         { VK_DOWN, OnArrowKey },
         { VK_RIGHT, OnArrowKey },
+
+        { VK_HOME, OnHomeKey },
     };
 
 LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam)
@@ -97,4 +100,11 @@ void OnArrowKey(WORD key)
         ::keybd_event(static_cast<BYTE>(key), 0, 0, 0);
         ::keybd_event(static_cast<BYTE>(key), 0, KEYEVENTF_KEYUP, 0);
     }
+}
+
+void OnHomeKey(WORD key)
+{
+    const WCHAR kProcessName[] = L"WDExpress.exe";
+
+    ActivateProcess(kProcessName);
 }
