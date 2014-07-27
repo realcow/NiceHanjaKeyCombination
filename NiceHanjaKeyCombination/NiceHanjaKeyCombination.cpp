@@ -1,9 +1,9 @@
 // NiceHanjaKeyCombination.cpp : Defines the entry point for the application.
 //
 
-#include "stdafx.h"
+#include "pch.h"
 #include "NiceHanjaKeyCombination.h"
-#include "KeyboardHookAgent/DLLDefines.h"
+#include "KeyboardHookAgent/GlobalKeyHook/GlobalKeyHook.h"
 
 #pragma comment(lib, "KeyboardHookAgent.lib")
 

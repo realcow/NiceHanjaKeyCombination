@@ -79,9 +79,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="GlobalKeyHook\GlobalKeyHook.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="DLLDefines.h" />
+    <ClInclude Include="GlobalKeyHook\GlobalKeyHook.h" />
+    <ClInclude Include="KeyboardHookAgentDefines.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utils\Utils.vcxproj">
