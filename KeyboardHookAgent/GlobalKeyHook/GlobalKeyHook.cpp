@@ -12,11 +12,14 @@ HHOOK hKeyHook;
 ULONGLONG cooldownInTick = 0;
 
 LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK KeyHookProcForMonitoring(int code, WPARAM wParam, LPARAM lParam);
 
 __declspec(dllexport)
 void InstallKeyboardHookAgent()
 {
-    hKeyHook = ::SetWindowsHookExW(WH_KEYBOARD, KeyHookProc, hDll, 0);
+    bool monitorKeyboardHookEvent = true;
+    auto keyHookProc = monitorKeyboardHookEvent ? KeyHookProcForMonitoring : KeyHookProc;
+    hKeyHook = ::SetWindowsHookExW(WH_KEYBOARD, keyHookProc, hDll, 0);
 }
 
 __declspec(dllexport)
@@ -109,4 +112,13 @@ void OnArrowKey(WORD key)
         ::keybd_event(static_cast<BYTE>(key), 0, 0, 0);
         ::keybd_event(static_cast<BYTE>(key), 0, KEYEVENTF_KEYUP, 0);
     }
+}
+
+LRESULT CALLBACK KeyHookProcForMonitoring(int code, WPARAM wParam, LPARAM lParam)
+{
+    if (code == HC_ACTION) 
+    { 
+        _RPT2(_CRT_WARN, "wParam: %08X, lParam: %08X", wParam, lParam);
+    }
+    return ::CallNextHookEx(hKeyHook, code, wParam, lParam);
 }
