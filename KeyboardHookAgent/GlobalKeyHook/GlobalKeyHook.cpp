@@ -66,7 +66,7 @@ bool IsHanjaEnabled(WPARAM wParam, LPARAM lParam)
     }
     else
     {
-        DWORD64 kHanjaKeyLastingTime = 100;
+        DWORD64 kHanjaKeyLastingTime = 300;
         if (now - hanjaKeyLastPressedTime < kHanjaKeyLastingTime)
         {
             return true;
@@ -94,6 +94,7 @@ LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam)
         if (now - cooldownInTick < kCooldownInTick) { break; }
         cooldownInTick = now;
 
+        _RPT1(_CRT_WARN, "hanja + %d key detected", wParam);
         it->handler(wParam);
     } while (0);
 
