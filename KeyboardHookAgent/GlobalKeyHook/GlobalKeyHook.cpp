@@ -17,7 +17,7 @@ LRESULT CALLBACK KeyHookProcForMonitoring(int code, WPARAM wParam, LPARAM lParam
 __declspec(dllexport)
 void InstallKeyboardHookAgent()
 {
-    bool monitorKeyboardHookEvent = true;
+    bool monitorKeyboardHookEvent = false;
     auto keyHookProc = monitorKeyboardHookEvent ? KeyHookProcForMonitoring : KeyHookProc;
     hKeyHook = ::SetWindowsHookExW(WH_KEYBOARD, keyHookProc, hDll, 0);
 }
@@ -46,6 +46,8 @@ vector<KeyHandlerEntry> keyHandlers =
     { VK_HOME, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"devenv.exe") },
     //{ VK_HOME, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"WDExpress.exe") },
     { VK_END, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"notepad++.exe") },
+    { VK_NUMPAD0, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"POWERPNT.exe") },
+    { VK_NUMPAD1, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"dbgview.exe") },
 };
 
 // *NOTE(realcow):
