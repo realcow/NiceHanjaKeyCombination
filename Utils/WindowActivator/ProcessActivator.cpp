@@ -31,8 +31,19 @@ bool ActivateProcess(const wstring& imageFilename)
         return false;
     }
 
-    // Activate
-    SetForeground(hwndToActivate);
+    // 윈도우가 최소화 상태이면 복원하고 그렇지 않으면 'foreground' 윈도우로 만듦
+    bool isMinimized = (::IsIconic(hwndToActivate) == TRUE);
+    if (isMinimized)
+    {
+        _RPT0(_CRT_WARN, "That window is iconic");
+        ::ShowWindow(hwndToActivate, SW_RESTORE);
+    }
+    else
+    {
+        // Activate
+        SetForeground(hwndToActivate);
+    }
+
 
     // 타겟 윈도우 타이틀 출력; 디버깅용
     if (0)
