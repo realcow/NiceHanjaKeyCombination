@@ -35,6 +35,7 @@ struct KeyHandlerEntry
 };
 
 void OnArrowKey(WORD key);
+void ShowWindowOfProcess(WORD key, const wstring& s);
 
 vector<KeyHandlerEntry> keyHandlers =
 {
@@ -43,11 +44,14 @@ vector<KeyHandlerEntry> keyHandlers =
     { VK_DOWN, OnArrowKey },
     { VK_RIGHT, OnArrowKey },
 
-    { VK_HOME, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"devenv.exe") },
-    //{ VK_HOME, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"WDExpress.exe") },
-    { VK_END, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"notepad++.exe") },
-    { VK_NUMPAD0, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"POWERPNT.exe") },
-    { VK_NUMPAD1, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"dbgview.exe") },
+    { VK_HOME, std::bind(ShowWindowOfProcess, std::placeholders::_1, L"devenv.exe") },
+    //{ VK_HOME, ActivateProcess, std::placeholders::_1, L"WDExpress.exe") },
+    { VK_END, std::bind(ShowWindowOfProcess, std::placeholders::_1, L"notepad++.exe") },
+
+    { VK_NUMPAD0, std::bind(ShowWindowOfProcess, std::placeholders::_1, L"deskCAT4.exe") },
+    { VK_NUMPAD1, std::bind(ShowWindowOfProcess, std::placeholders::_1, L"POWERPNT.exe") },
+    { VK_NUMPAD2, std::bind(ShowWindowOfProcess, std::placeholders::_1, L"dbgview.exe") },
+    { VK_NUMPAD3, std::bind(ShowWindowOfProcess, std::placeholders::_1, L"p4v.exe") },
 };
 
 // *NOTE(realcow):
@@ -123,4 +127,9 @@ LRESULT CALLBACK KeyHookProcForMonitoring(int code, WPARAM wParam, LPARAM lParam
         _RPT2(_CRT_WARN, "wParam: %08X, lParam: %08X", wParam, lParam);
     }
     return ::CallNextHookEx(hKeyHook, code, wParam, lParam);
+}
+
+void ShowWindowOfProcess(WORD key, const wstring& s)
+{
+    ActivateProcess(s);
 }
