@@ -1,0 +1,3 @@
+[submodule "JinLibrary"]
+	path = JinLibrary
+	url = https://github.com/realcow/JinLibrary.git
