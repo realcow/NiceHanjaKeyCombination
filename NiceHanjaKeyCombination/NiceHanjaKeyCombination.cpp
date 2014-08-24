@@ -4,6 +4,7 @@
 #include "pch.h"
 #include "NiceHanjaKeyCombination.h"
 #include "KeyboardHookAgent/GlobalKeyHook/GlobalKeyHook.h"
+#include "KeyDispatcher.h"
 
 #pragma comment(lib, "KeyboardHookAgent.lib")
 
@@ -135,7 +136,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch (message)
 	{
     case WM_CREATE:
-        InstallKeyboardHookAgent();
+        InstallKeyboardHookAgent(hWnd);
+        break;
+
+    case WM_USER + 1423:
+        {
+            KeyDispatcher::onKeyPress(wParam);
+        }
         break;
 
 	case WM_COMMAND:

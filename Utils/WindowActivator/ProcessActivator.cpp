@@ -1,7 +1,9 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "ProcessActivator.h"
+#include <jin/win/Process.h>
 #include <tchar.h>
 #include <tlhelp32.h>
+
 
 using namespace std;
 
@@ -10,25 +12,30 @@ namespace
     BOOL FindProcessByImageName(const wstring& imageFilename);
     HWND FindWindowHandleFromPid(DWORD pid);
     bool SetForeground(HWND window);
+    bool ActivateProcess(const wstring& imageFilename);
 }
 
 /*
+    파일이름으로 프로세스를 찾아 그 프로세스가 가진 윈도우를 프론트로 내세운다
     참고링크: Taking a Snapshot and Viewing Processes(http://msdn.microsoft.com/ko-kr/library/windows/desktop/ms686701(v=vs.85).aspx)
 */
-bool ActivateProcess(const wstring& imageFilename)
+void ProcessActivator::operator()(WORD key)
 {
     // 찾는 이미지 이름을 가진 프로세스를 검색
-    DWORD pidToActivate = FindProcessByImageName(imageFilename);
+    DWORD pidToActivate = FindProcessByImageName(processImageName);
     if (pidToActivate == (DWORD)-1)
     {
-        return false;
+        jin::win::Process process;
+        process.StartInfo.FileName = processPath.wstring();
+        process.Start();
+        return;
     }
 
     // 프로세스가 가진 윈도우 중 Activate할 윈도우를 찾음.
     HWND hwndToActivate = FindWindowHandleFromPid(pidToActivate);
     if (!hwndToActivate)
     {
-        return false;
+        return;
     }
 
     // 윈도우가 최소화 상태이면 복원하고 그렇지 않으면 'foreground' 윈도우로 만듦
@@ -52,8 +59,6 @@ bool ActivateProcess(const wstring& imageFilename)
         ::GetWindowText(hwndToActivate, buff, 100);
         printf("%S", buff);
     }
-
-    return true;
 }
 
 namespace
@@ -97,6 +102,12 @@ namespace
         CloseHandle(hProcessSnap);
         return foundPid;
     }
+
+    void RunProcesAndWait()
+    {
+
+
+    }
     
     HWND GetTheHighestAncestorWindow(HWND h)
     {
@@ -138,9 +149,16 @@ namespace
         return h;
     }
 
+    // *TODO: 개선하자
     bool SetForeground(HWND window) 
     {
-        ::SetForegroundWindow(window);
+        // *NOTE: SearchExpress에서 가져옴. 언제 이걸 통합해야 하는데.
+        // 그리고 미니마이즈 & 리스토어되는 애니매이션이 보인다.
+        ::ShowWindow(window, SW_SHOWMINNOACTIVE); // 그나마 가장 잘 작동함. 그래도 작업관리자보다 앞에 튀어나오진 않음.
+        ::ShowWindow(window, SW_RESTORE);
+
+        // 이 방식은 현재 실행 중인 스레드가 포그라운드 윈도우 스레드이면 작동하는데, 그 외엔 그렇지 않더라.
+        //::SetForegroundWindow(window); 
         return true;
     }
 }

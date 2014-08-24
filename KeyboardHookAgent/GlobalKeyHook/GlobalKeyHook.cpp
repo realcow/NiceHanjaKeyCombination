@@ -1,25 +1,29 @@
+#include "GlobalKeyHook.h"
 #include <windows.h>
-#include <functional>
-#include <vector>
-#include <algorithm>
-#include <Utils/WindowActivator/ProcessActivator.h>
 #include <crtdbg.h>
 
 using namespace std;
 
 extern HINSTANCE hDll;
 HHOOK hKeyHook;
+
+#pragma data_seg(".npdata")
+HWND nhkcHwnd = 0;
 ULONGLONG cooldownInTick = 0;
+#pragma data_seg()
+
+#pragma comment (linker, "/SECTION:.npdata,RWS")
 
 LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK KeyHookProcForMonitoring(int code, WPARAM wParam, LPARAM lParam);
 
 __declspec(dllexport)
-void InstallKeyboardHookAgent()
+void InstallKeyboardHookAgent(HWND _nhkcHwnd)
 {
     bool monitorKeyboardHookEvent = false;
     auto keyHookProc = monitorKeyboardHookEvent ? KeyHookProcForMonitoring : KeyHookProc;
     hKeyHook = ::SetWindowsHookExW(WH_KEYBOARD, keyHookProc, hDll, 0);
+    nhkcHwnd = _nhkcHwnd;
 }
 
 __declspec(dllexport)
@@ -27,28 +31,6 @@ void UninstalKeyboardHookAgent()
 {
     ::UnhookWindowsHookEx(hKeyHook);
 }
-
-struct KeyHandlerEntry
-{
-    WORD key;
-    function<void(WORD /*key*/)> handler;
-};
-
-void OnArrowKey(WORD key);
-
-vector<KeyHandlerEntry> keyHandlers =
-{
-    { VK_LEFT, OnArrowKey },
-    { VK_UP, OnArrowKey },
-    { VK_DOWN, OnArrowKey },
-    { VK_RIGHT, OnArrowKey },
-
-    { VK_HOME, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"devenv.exe") },
-    //{ VK_HOME, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"WDExpress.exe") },
-    { VK_END, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"notepad++.exe") },
-    { VK_NUMPAD0, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"POWERPNT.exe") },
-    { VK_NUMPAD1, bind([](WORD key, const wstring& s){ ActivateProcess(s); }, std::placeholders::_1, L"dbgview.exe") },
-};
 
 // *NOTE(realcow):
 // VK_HANJA 후킹시 keydown은 발생하는데 keyup이 발생하지 않음. (WH_KEYBOARD, WH_KEYBOARD_LL)
@@ -89,31 +71,16 @@ LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam)
         
         if (!IsHanjaEnabled(wParam, lParam)) { break; }
 
-        auto it = find_if(keyHandlers.cbegin(), keyHandlers.cend(), [&](const KeyHandlerEntry& entry) {
-            return entry.key == wParam;
-        });
-        if (it == keyHandlers.cend()) { break; }
-
         DWORD64 kCooldownInTick = 50;
         auto now = ::GetTickCount64();
         if (now - cooldownInTick < kCooldownInTick) { break; }
         cooldownInTick = now;
 
         _RPT1(_CRT_WARN, "hanja + %d key detected", wParam);
-        it->handler(wParam);
+        ::PostMessage(nhkcHwnd, WM_USER + 1423, wParam, lParam);
     } while (0);
 
     return ::CallNextHookEx(hKeyHook, code, wParam, lParam);
-}
-
-void OnArrowKey(WORD key)
-{
-    const int kArrowKeyRepeatCount = 2;
-    for (int i = 0; i < kArrowKeyRepeatCount; i++)
-    {
-        ::keybd_event(static_cast<BYTE>(key), 0, 0, 0);
-        ::keybd_event(static_cast<BYTE>(key), 0, KEYEVENTF_KEYUP, 0);
-    }
 }
 
 LRESULT CALLBACK KeyHookProcForMonitoring(int code, WPARAM wParam, LPARAM lParam)

@@ -15,12 +15,14 @@
     <ClInclude Include="pch.h">
       <Filter>PrecompiledHeader</Filter>
     </ClInclude>
+    <ClInclude Include="KeyDispatcher.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NiceHanjaKeyCombination.cpp" />
     <ClCompile Include="pch.cpp">
       <Filter>PrecompiledHeader</Filter>
     </ClCompile>
+    <ClCompile Include="KeyDispatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NiceHanjaKeyCombination.rc">

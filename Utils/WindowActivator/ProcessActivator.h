@@ -1,6 +1,22 @@
-#pragma once
+﻿#pragma once
+
+#include <boost/filesystem.hpp>
+
 #include <Windows.h>
 #include <string>
 
-// 파일이름으로 프로세스를 찾아 그 프로세스가 가진 윈도우를 프론트로 내세운다
-bool ActivateProcess(const std::wstring& imageFilename);
+class ProcessActivator
+{
+public:
+    ProcessActivator(const boost::filesystem::path& processPath)
+        : processPath(processPath)
+    {
+        processImageName = processPath.filename().wstring();
+    }
+
+    void operator()(WORD key);
+
+private:
+    std::wstring processImageName;
+    boost::filesystem::path processPath;
+};
