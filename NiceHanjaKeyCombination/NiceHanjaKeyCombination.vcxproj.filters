@@ -16,6 +16,8 @@
       <Filter>PrecompiledHeader</Filter>
     </ClInclude>
     <ClInclude Include="KeyDispatcher.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="NHKCMessageDefines.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NiceHanjaKeyCombination.cpp" />

@@ -1,4 +1,5 @@
-#include "GlobalKeyHook.h"
+ï»¿#include "GlobalKeyHook.h"
+#include <NiceHanjaKeyCombination\NHKCMessageDefines.h>
 #include <windows.h>
 #include <crtdbg.h>
 
@@ -33,13 +34,13 @@ void UninstalKeyboardHookAgent()
 }
 
 // *NOTE(realcow):
-// VK_HANJA ÈÄÅ·½Ã keydownÀº ¹ß»ýÇÏ´Âµ¥ keyupÀÌ ¹ß»ýÇÏÁö ¾ÊÀ½. (WH_KEYBOARD, WH_KEYBOARD_LL)
-// IME¿Í °ü·ÃÀÌ ÀÖ´Â °Í °°Àºµ¥ ÀÌ°Í ¶§¹®¿¡ ÇöÀç ´­·ÁÁø Å° Á¶ÇÕÀÌ ÇÑÀÚÅ°¸¦ Æ÷ÇÔÇÏ°í ÀÖ´ÂÁö ¾Ë ¼ö ¾ø´Â »óÅÂ.
-// ¹®Á¦ ÇØ°áÀ» À§ÇØ ÃëÇØ¾ßÇÒ ¾×¼Ç
-//  - IME µ¿ÀÛÀ» Á¶»çÇØ¼­ ÇØ°á¹ýÀ» Ã£¾Æº»´Ù
-//  - DirectInputÀ» ½áº»´Ù?
-//  - ÀÌ°Íµµ Àú°Íµµ ´Ù ¾ÈµÇ¸é Å°º¸µå ÇÊÅÍ µå¶óÀÌ¹ö¸¦ ¾´´Ù.
-// ±×·¡¼­ ÇöÀç´Â ¸¶Áö¸· ÇÑÀÚÅ°°¡ ´­¸° ½Ã°£À¸·ÎºÎÅÍ ÀÏÁ¤½Ã°£ µ¿¾È ÇÑÀÚÅ°°¡ ´­·È´Ù°í °£ÁÖÇÏ´Â ¹æ½ÄÀ¸·Î ÇÏ°í ÀÖÀ½. ÀÌ ¹æ½ÄÀ¸·Î´Â home, end ´ÜÃàÅ°¸¸ ´ë°­ ÀÛµ¿ÇÏ´Â »óÅÂ ¤Ð
+// VK_HANJA í›„í‚¹ì‹œ keydownì€ ë°œìƒí•˜ëŠ”ë° keyupì´ ë°œìƒí•˜ì§€ ì•ŠìŒ. (WH_KEYBOARD, WH_KEYBOARD_LL)
+// IMEì™€ ê´€ë ¨ì´ ìžˆëŠ” ê²ƒ ê°™ì€ë° ì´ê²ƒ ë•Œë¬¸ì— í˜„ìž¬ ëˆŒë ¤ì§„ í‚¤ ì¡°í•©ì´ í•œìží‚¤ë¥¼ í¬í•¨í•˜ê³  ìžˆëŠ”ì§€ ì•Œ ìˆ˜ ì—†ëŠ” ìƒíƒœ.
+// ë¬¸ì œ í•´ê²°ì„ ìœ„í•´ ì·¨í•´ì•¼í•  ì•¡ì…˜
+//  - IME ë™ìž‘ì„ ì¡°ì‚¬í•´ì„œ í•´ê²°ë²•ì„ ì°¾ì•„ë³¸ë‹¤
+//  - DirectInputì„ ì¨ë³¸ë‹¤?
+//  - ì´ê²ƒë„ ì €ê²ƒë„ ë‹¤ ì•ˆë˜ë©´ í‚¤ë³´ë“œ í•„í„° ë“œë¼ì´ë²„ë¥¼ ì“´ë‹¤.
+// ê·¸ëž˜ì„œ í˜„ìž¬ëŠ” ë§ˆì§€ë§‰ í•œìží‚¤ê°€ ëˆŒë¦° ì‹œê°„ìœ¼ë¡œë¶€í„° ì¼ì •ì‹œê°„ ë™ì•ˆ í•œìží‚¤ê°€ ëˆŒë ¸ë‹¤ê³  ê°„ì£¼í•˜ëŠ” ë°©ì‹ìœ¼ë¡œ í•˜ê³  ìžˆìŒ. ì´ ë°©ì‹ìœ¼ë¡œëŠ” home, end ë‹¨ì¶•í‚¤ë§Œ ëŒ€ê°• ìž‘ë™í•˜ëŠ” ìƒíƒœ ã… 
 bool IsHanjaEnabled(WPARAM wParam, LPARAM lParam)
 {
     static DWORD64 hanjaKeyLastPressedTime = 0;
@@ -77,7 +78,7 @@ LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam)
         cooldownInTick = now;
 
         _RPT1(_CRT_WARN, "hanja + %d key detected", wParam);
-        ::PostMessage(nhkcHwnd, WM_USER + 1423, wParam, lParam);
+        ::PostMessage(nhkcHwnd, NHKCMessages::WM_SHORTCUT_KEY_PRESSED, wParam, lParam);
     } while (0);
 
     return ::CallNextHookEx(hKeyHook, code, wParam, lParam);
