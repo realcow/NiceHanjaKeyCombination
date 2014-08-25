@@ -13,6 +13,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utils", "Utils\Utils.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jinlibrary-static", "JinLibrary\vs\jinlibrary-static.vcxproj", "{5AD417CA-40D8-4A12-990B-9B8562EF4E57}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JinLibrary", "JinLibrary", "{5190731A-7DBF-49DB-A110-28E5B63BF8A6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "third-party-static", "..\JinLibrary\vs\third-party-static.vcxproj", "{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -39,8 +43,16 @@ Global
 		{5AD417CA-40D8-4A12-990B-9B8562EF4E57}.Debug|Win32.Build.0 = Debug|Win32
 		{5AD417CA-40D8-4A12-990B-9B8562EF4E57}.Release|Win32.ActiveCfg = Release|Win32
 		{5AD417CA-40D8-4A12-990B-9B8562EF4E57}.Release|Win32.Build.0 = Release|Win32
+		{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3}.Debug|Win32.Build.0 = Debug|Win32
+		{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3}.Release|Win32.ActiveCfg = Release|Win32
+		{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5AD417CA-40D8-4A12-990B-9B8562EF4E57} = {5190731A-7DBF-49DB-A110-28E5B63BF8A6}
+		{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3} = {5190731A-7DBF-49DB-A110-28E5B63BF8A6}
 	EndGlobalSection
 EndGlobal

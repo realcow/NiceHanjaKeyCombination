@@ -3,12 +3,16 @@
 
 #include "pch.h"
 #include "NiceHanjaKeyCombination.h"
-#include "KeyboardHookAgent/GlobalKeyHook/GlobalKeyHook.h"
 #include "KeyDispatcher.h"
 #include "NHKCMessageDefines.h"
+#include <KeyboardHookAgent/GlobalKeyHook/GlobalKeyHook.h>
+#include <JinLibrary/jin/win/StartupRegister.h>
+#include <JinLibrary/jin/win/PathPicker.h>
 
 #include <shellapi.h>
-#pragma comment(lib, "KeyboardHookAgent.lib")
+
+#include <string>
+using namespace std;
 
 #define MAX_LOADSTRING 100
 
@@ -126,6 +130,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 void CreateTrayIcon(HWND hWnd);
 void DestroyTrayIcon(HWND hWnd);
+void DispatchStartupRelatedCommands(int command);
 
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -185,6 +190,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_EXIT:
             DestroyWindow(hWnd);
             break;
+        case IDM_REGISTER_TO_STARTUP:
+        case IDM_DEREGISTER_FROM_STARTUP:
+            DispatchStartupRelatedCommands(wmId);
+            break;
         default:
             return DefWindowProc(hWnd, message, wParam, lParam);
         }
@@ -204,6 +213,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
+
+void DispatchStartupRelatedCommands(int command)
+{
+    OSVERSIONINFO winVersion;
+    ZeroMemory(&winVersion, sizeof winVersion);
+    winVersion.dwOSVersionInfoSize = sizeof winVersion;
+    ::GetVersionEx(&winVersion);
+    
+    bool isAboveXP = false;
+    isAboveXP = (winVersion.dwMajorVersion >= 6);
+
+    const wstring kTaskName = L"NiceHanjaKeyCombination";
+    switch (command)
+    {
+    case IDM_REGISTER_TO_STARTUP:
+        {
+            wstring thisExecPath = jin::win::PathPicker::GetModuleFileNameW(0);
+            if (isAboveXP)
+            {
+                jin::win::StartupRegister::registerToTaskScheduler(kTaskName, thisExecPath);
+            }
+            else
+            {
+                jin::win::StartupRegister::registerToRunRegistry(kTaskName, thisExecPath);
+            }
+        }
+        break;
+
+    case IDM_DEREGISTER_FROM_STARTUP:
+        if (isAboveXP)
+        {
+            jin::win::StartupRegister::deregisterFromTaskScheduler(kTaskName);
+        }
+        else
+        {
+            jin::win::StartupRegister::deregisterFromRunRegistry(kTaskName);
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
 
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)

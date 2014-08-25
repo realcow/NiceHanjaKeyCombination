@@ -44,7 +44,7 @@ void UninstalKeyboardHookAgent()
 bool IsHanjaEnabled(WPARAM wParam, LPARAM lParam)
 {
     static DWORD64 hanjaKeyLastPressedTime = 0;
-    DWORD64 now = ::GetTickCount64();
+    DWORD64 now = ::GetTickCount();
 
     if (wParam == VK_HANJA)
     {
@@ -73,7 +73,7 @@ LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam)
         if (!IsHanjaEnabled(wParam, lParam)) { break; }
 
         DWORD64 kCooldownInTick = 50;
-        auto now = ::GetTickCount64();
+        auto now = ::GetTickCount();
         if (now - cooldownInTick < kCooldownInTick) { break; }
         cooldownInTick = now;
 
