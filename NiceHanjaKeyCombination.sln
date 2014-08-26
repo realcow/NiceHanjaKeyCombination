@@ -15,7 +15,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jinlibrary-static", "JinLib
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "JinLibrary", "JinLibrary", "{5190731A-7DBF-49DB-A110-28E5B63BF8A6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "third-party-static", "..\JinLibrary\vs\third-party-static.vcxproj", "{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "third-party-static", "JinLibrary\vs\third-party-static.vcxproj", "{FAAE3761-9AB1-4DCE-8881-DA1A6A9948A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
