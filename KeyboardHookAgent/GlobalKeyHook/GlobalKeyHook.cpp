@@ -63,6 +63,30 @@ bool IsHanjaEnabled(WPARAM wParam, LPARAM lParam)
     return false;
 }
 
+void SendKeyInfoOverPipe(WORD key)
+{
+    HANDLE hPipe = ::CreateFile(NHKCMessages::kNhkcPipeName.c_str(),
+        GENERIC_WRITE,
+        0,
+        nullptr,
+        OPEN_EXISTING,
+        0,
+        0);
+    if (hPipe == INVALID_HANDLE_VALUE)
+    {
+        _RPT1(_CRT_WARN, "createfile fails %u", ::GetLastError());
+    }
+
+    if (hPipe != INVALID_HANDLE_VALUE)
+    {
+        NHKCMessages::KeyHookMessage msg;
+        DWORD written = 0;
+        msg.key = key;
+        ::WriteFile(hPipe, &msg, sizeof(msg), &written, nullptr);
+        ::CloseHandle(hPipe);
+    }
+}
+
 LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam)
 {
     static bool hanjaPressed = false;
@@ -78,8 +102,15 @@ LRESULT CALLBACK KeyHookProc(int code, WPARAM wParam, LPARAM lParam)
         cooldownInTick = now;
 
         _RPT1(_CRT_WARN, "hanja + %d key detected", wParam);
-        ::PostMessage(nhkcHwnd, NHKCMessages::WM_SHORTCUT_KEY_PRESSED, wParam, lParam);
-    } while (0);
+        // 
+        //BOOL ret = ::PostMessage(nhkcHwnd, NHKCMessages::WM_SHORTCUT_KEY_PRESSED, wParam, lParam);
+        //if (ret == FALSE)
+        //{
+        //    _RPT1(_CRT_WARN, "posting message fails. errorcode: %d", ::GetLastError());
+        //}
+        SendKeyInfoOverPipe((WORD)wParam);
+    }
+    while (0);
 
     return ::CallNextHookEx(hKeyHook, code, wParam, lParam);
 }

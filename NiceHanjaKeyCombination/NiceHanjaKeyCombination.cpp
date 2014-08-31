@@ -10,7 +10,11 @@
 #include <JinLibrary/jin/win/PathPicker.h>
 
 #include <shellapi.h>
+#include <sddl.h>
+#pragma comment(lib, "Advapi32.lib")
+#pragma comment(lib, "Rpcrt4.lib")
 
+#include <thread>
 #include <string>
 using namespace std;
 
@@ -131,6 +135,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 void CreateTrayIcon(HWND hWnd);
 void DestroyTrayIcon(HWND hWnd);
 void DispatchStartupRelatedCommands(int command);
+void CreateMessagingChannel();
 
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -151,6 +156,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_CREATE:
+        CreateMessagingChannel();
         InstallKeyboardHookAgent(hWnd);
         CreateTrayIcon(hWnd);
         Global::hwnd = hWnd;
@@ -257,7 +263,6 @@ void DispatchStartupRelatedCommands(int command)
     }
 }
 
-
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -276,6 +281,71 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     }
     return (INT_PTR)FALSE;
+}
+
+void KeyInfoMessageReceiverThreadFunc()
+{
+    while (true)
+    {
+#define LOW_INTEGRITY_SDDL_SACL_W L"S:(ML;;NW;;;S-1-16-0)"
+
+        DWORD dwErr = ERROR_SUCCESS;
+
+        SECURITY_ATTRIBUTES sa;
+        sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+        sa.bInheritHandle = FALSE;
+        
+        // credit: http://www.osronline.com/showthread.cfm?link=204207
+        ConvertStringSecurityDescriptorToSecurityDescriptor(
+            _T("D:(D;;FA;;;NU)(A;;0x12019f;;;WD)(A;;0x12019f;;;CO)"),
+            SDDL_REVISION_1,
+            &sa.lpSecurityDescriptor,
+            NULL);
+
+        HANDLE hPipe = ::CreateNamedPipe(NHKCMessages::kNhkcPipeName.c_str(),
+            PIPE_ACCESS_INBOUND,
+            PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT,
+            PIPE_UNLIMITED_INSTANCES,
+            0x1000, 0x1000,
+            NMPWAIT_WAIT_FOREVER,
+            &sa);
+        if (hPipe == INVALID_HANDLE_VALUE)
+        {
+            _RPT1(_CRT_WARN, "pipe create fails. errorcode: %u", ::GetLastError());
+            return;
+        }
+
+        if (::ConnectNamedPipe(hPipe, nullptr) == FALSE)
+        {
+            _RPT1(_CRT_WARN, "ConnectNamedPipe fails. errorcode: %u", ::GetLastError());
+            break;
+        }
+        while (1)
+        {
+            NHKCMessages::KeyHookMessage msg;
+            DWORD read = 0;
+            if (::ReadFile(hPipe, &msg, sizeof(msg), &read, nullptr) == FALSE)
+            {
+                _RPT1(_CRT_WARN, "ReadFile fails. code: %u\n", ::GetLastError());
+                break;
+            }
+            if (msg.signature != NHKCMessages::KeyHookMessage::kSignature)
+            {
+                _RPT0(_CRT_WARN, "Invalid signature\n");
+                continue;
+            }
+            ::PostMessage(Global::hwnd, NHKCMessages::WM_SHORTCUT_KEY_PRESSED, msg.key, 0);
+            _RPT1(_CRT_WARN, "received code: %d\n", msg.key);
+        }
+        ::CloseHandle(hPipe);
+    }
+}
+
+// 키보드 후킹 모듈과 통신할 채널(Pipe) 생성
+void CreateMessagingChannel()
+{
+    thread receiver(KeyInfoMessageReceiverThreadFunc);
+    receiver.detach();
 }
 
 void CreateTrayIcon(HWND hWnd)

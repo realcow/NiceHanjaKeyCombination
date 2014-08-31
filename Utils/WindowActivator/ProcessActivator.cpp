@@ -3,16 +3,19 @@
 #include <jin/win/Process.h>
 #include <tchar.h>
 #include <tlhelp32.h>
+#include <crtdbg.h>
 
 
 using namespace std;
 
 namespace
 {
-    BOOL FindProcessByImageName(const wstring& imageFilename);
+    bool FindProcessesByImageName(const wstring& imageFilename, vector<DWORD>& processes);
     HWND FindWindowHandleFromPid(DWORD pid);
     bool SetForeground(HWND window);
     bool ActivateProcess(const wstring& imageFilename);
+
+    DWORD g_lastActivatedPid = 0;
 }
 
 /*
@@ -22,13 +25,33 @@ namespace
 void ProcessActivator::operator()(WORD key)
 {
     // 찾는 이미지 이름을 가진 프로세스를 검색
-    DWORD pidToActivate = FindProcessByImageName(processImageName);
-    if (pidToActivate == (DWORD)-1)
+    vector<DWORD> pids;
+    bool success = FindProcessesByImageName(processImageName, pids);
+    if (pids.empty())
     {
+        // *TODO: 실패시 실행할 프로세스가 실행되지 않아서 실패했다고 가정하고 있다. 이 부분 좀 더 보강
         jin::win::Process process;
         process.StartInfo.FileName = processPath.wstring();
         process.Start();
         return;
+    }
+
+    DWORD pidToActivate = 0;
+    if (pids.size() > 0)
+    {
+        DWORD currentlyActivatedPid;
+        HWND foregroundWindow = ::GetForegroundWindow();
+        ::GetWindowThreadProcessId(foregroundWindow, &currentlyActivatedPid);
+        auto it = find(pids.begin(), pids.end(), currentlyActivatedPid);
+        if (it != pids.end())
+        {
+            pidToActivate = pids[(it - pids.begin() + 1) % pids.size()];
+            _RPT1(_CRT_WARN, "activate %u", pidToActivate);
+        }
+    }
+    if (pidToActivate == 0)
+    {
+        pidToActivate = pids.front();
     }
 
     // 프로세스가 가진 윈도우 중 Activate할 윈도우를 찾음.
@@ -63,8 +86,10 @@ void ProcessActivator::operator()(WORD key)
 
 namespace
 {
-    BOOL FindProcessByImageName(const wstring& imageFilename)
-    {
+    bool FindProcessesByImageName(const wstring& imageFilename, vector<DWORD>& processes)
+{
+        processes.clear();
+
         HANDLE hProcessSnap;
         PROCESSENTRY32 pe32;
         DWORD foundPid = (DWORD)-1;
@@ -73,7 +98,7 @@ namespace
         hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
         if (hProcessSnap == INVALID_HANDLE_VALUE)
         {
-            return (DWORD)-1;
+            return false;
         }
 
         // Set the size of the structure before using it.
@@ -83,8 +108,8 @@ namespace
         // and exit if unsuccessful
         if (!Process32First(hProcessSnap, &pe32))
         {
-            CloseHandle(hProcessSnap);          // clean the snapshot object
-            return (DWORD)-1;
+            ::CloseHandle(hProcessSnap);          // clean the snapshot object
+            return false;
         }
 
         // Now walk the snapshot of processes, and
@@ -93,14 +118,12 @@ namespace
         {
             if (_wcsicmp(pe32.szExeFile, imageFilename.c_str()) == 0)
             {
-                foundPid = pe32.th32ProcessID;
-                break;
+                processes.push_back(pe32.th32ProcessID);
             }
-
         } while (Process32Next(hProcessSnap, &pe32));
 
-        CloseHandle(hProcessSnap);
-        return foundPid;
+        ::CloseHandle(hProcessSnap);
+        return true;
     }
 
     void RunProcesAndWait()
@@ -139,7 +162,6 @@ namespace
                 HWND ancestor = GetTheHighestAncestorWindow(h);
                 if (!!ancestor && ::IsWindowVisible(ancestor) == TRUE)
                 {
-                    
                     h = ancestor;
                     break;
                 }

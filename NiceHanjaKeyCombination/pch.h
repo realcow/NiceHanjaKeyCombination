@@ -9,3 +9,8 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+// STD
+#include <vector>
+#include <map>
+#include <string>
